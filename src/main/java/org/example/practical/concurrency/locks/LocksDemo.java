@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
  */
 public class LocksDemo {
 
-    final private int offset = 10_000_000;
+    final private int offset = 10;
     final private Counter counter = new Counter();
     final private SyncCounter syncCounter = new SyncCounter();
     final private LockedCounter lockedCounter = new LockedCounter();

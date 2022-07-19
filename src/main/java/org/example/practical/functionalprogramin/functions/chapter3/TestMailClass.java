@@ -1,5 +1,8 @@
 package org.example.practical.functionalprogramin.functions.chapter3;
 
+import static org.example.practical.functionalprogramin.functions.chapter3.supliers.Case.match;
+import static org.example.practical.functionalprogramin.functions.chapter3.supliers.Case.mcase;
+
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -12,10 +15,15 @@ import java.util.regex.Pattern;
  * logError</code> by doing that also we need to bind a <code>Result</code> to an effect. so lets
  * creates a interface <code>Effect</code>
  *
+ * 3. Lest get rid of if and else conditions by implementing <code>Suppliers</code>
+ *
  * @author Alexander Bravo
  */
 public class TestMailClass {
   static final Pattern emailPattern = Pattern.compile("^[a-z0-9._%+-]+@[a-z-9.-]+\\.[a-z]{2,4}$");
+
+  static Effect<String> success = s -> System.out.println("mail sent to: " + s);
+  static Effect<String> failure = s -> System.out.println("Error message logged: " + s);
 
   static Function<String, Result<String>> emailChecker =
       s -> {
@@ -29,6 +37,14 @@ public class TestMailClass {
           return Result.failure("email" + s + " is invalid.");
         }
       };
+
+  static Function<String, Result<String>> emailSupplierChecker = s ->
+      match(
+          mcase(() -> Result.success(s)),
+          mcase(() -> s == null, ()-> Result.failure("Email must not be null")),
+          mcase(()-> s.length() == 0, () -> Result.failure("mail can not be empty")),
+          mcase(()-> !emailPattern.matcher(s).matches(), ()-> Result.failure("email" +s+ " is invalid")));
+
 
   static void testMail(String mail) {
     if (emailPattern.matcher(mail).matches()) {
@@ -46,9 +62,6 @@ public class TestMailClass {
     System.out.println(s);
   }
 
-  static Effect<String> success = s -> System.out.println("mail sent to: " + s);
-  static Effect<String> failure = s -> System.out.println("Error message logged: " + s);
-
   public static void main(String[] args) {
     emailChecker
         .apply("john.doe@acme.com")
@@ -65,6 +78,12 @@ public class TestMailClass {
     //  validate(null).exec();
     //  validate("").exec();
     //  validate("paul.smith@acme.com").exec();
+
+    // Full functional implementation.
+    System.out.println("###### Full Functional #####");
+    emailSupplierChecker.apply("").bind(success, failure);
+    emailSupplierChecker.apply("this.mail@mail.com").bind(success, failure);
+    emailSupplierChecker.apply(null).bind(success, failure);
   }
 
   /**

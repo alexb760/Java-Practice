@@ -6,48 +6,65 @@ import java.util.regex.Pattern;
 /**
  * Bad implementation.
  *
- * 1. Lets firs creates an interface to support error handle. <code>Result</code>
- * 2. Now you need a functional interface representing an executable program <code>Executable </code>:
+ * <p>1. Lets firs creates an interface to support error handle. <code>Result</code> 2. Now you need
+ * a functional interface representing an executable program <code>Executable </code>. 3. Lets
+ * decouple <code>validate()</code> from effects <code>sendVerificationMail</code> and <code>
+ * logError</code> by doing that also we need to bind a <code>Result</code> to an effect. so lets
+ * creates a interface <code>Effect</code>
  *
  * @author Alexander Bravo
  */
 public class TestMailClass {
- final static Pattern emailPattern = Pattern.compile("^[a-z0-9._%+-]+@[a-z-9.-]+\\.[a-z]{2,4}$");
+  static final Pattern emailPattern = Pattern.compile("^[a-z0-9._%+-]+@[a-z-9.-]+\\.[a-z]{2,4}$");
 
- static Function<String, Result> emailChecker = s -> {
-  if (s == null) {
-   return new Result.Failure("email must not be null");
-  } else if (s.length() == 0) {
-   return new Result.Failure("email must not be empty");
-  } else if (emailPattern.matcher(s).matches()) {
-   return new Result.Success();
-  } else {
-   return new Result.Failure("email" + s + " is invalid.");
+  static Function<String, Result<String>> emailChecker =
+      s -> {
+        if (s == null) {
+          return Result.failure("email must not be null");
+        } else if (s.length() == 0) {
+          return Result.failure("email must not be empty");
+        } else if (emailPattern.matcher(s).matches()) {
+          return Result.success(s);
+        } else {
+          return Result.failure("email" + s + " is invalid.");
+        }
+      };
+
+  static void testMail(String mail) {
+    if (emailPattern.matcher(mail).matches()) {
+      sendVerificationMail(mail);
+    } else {
+      logError("email " + mail + " is invalid");
+    }
   }
- };
 
- static void testMail(String mail){
-  if (emailPattern.matcher(mail).matches()){
-   sendVerificationMail(mail);
-  }else {
-   logError("email " + mail + " is invalid");
-  }
-
- }
-
- private static void sendVerificationMail(String mail) {
+  private static void sendVerificationMail(String mail) {
     System.out.println("sending mail to..." + mail);
- }
+  }
 
- private static void logError(String s) {
+  private static void logError(String s) {
     System.out.println(s);
- }
+  }
 
- public static void main(String[] args) {
-  validate("john.doe@acme.com").exec();
-  validate(null).exec();
-  validate("").exec();
-  validate("paul.smith@acme.com").exec();
+  static Effect<String> success = s -> System.out.println("mail sent to: " + s);
+  static Effect<String> failure = s -> System.out.println("Error message logged: " + s);
+
+  public static void main(String[] args) {
+    emailChecker
+        .apply("john.doe@acme.com")
+        .bind(TestMailClass::sendVerificationMail, TestMailClass::logError);
+    emailChecker.apply(null).bind(TestMailClass::sendVerificationMail, TestMailClass::logError);
+    emailChecker.apply("").bind(TestMailClass::sendVerificationMail, TestMailClass::logError);
+
+    // Just a different way using Effect interface function.
+    emailChecker.apply("this.mail@mail.com").bind(success, failure);
+    emailChecker.apply("").bind(success, failure);
+    emailChecker.apply(null).bind(success, failure);
+
+    //  validate("john.doe@acme.com").exec();
+    //  validate(null).exec();
+    //  validate("").exec();
+    //  validate("paul.smith@acme.com").exec();
   }
 
   /**
@@ -80,12 +97,9 @@ public class TestMailClass {
    * @param s mail sent to.
    */
   static Executable validate(String s) {
-  Result result = emailChecker.apply(s);
-  return  (result instanceof Result.Success)
-      ? () -> sendVerificationMail(s)
-      : () -> logError(((Result.Failure) result).getMessage());
+    Result result = emailChecker.apply(s);
+    return (result instanceof Result.Success)
+        ? () -> sendVerificationMail(s)
+        : () -> logError(((Result.Failure) result).getMessage());
   }
-
- }
-
-
+}

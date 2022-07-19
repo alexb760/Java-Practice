@@ -1,22 +1,48 @@
 package org.example.practical.functionalprogramin.functions.chapter3;
 
-
 /**
  * First define a special component to handle the result of the computation.
  *
  * @author Alexander Bravo
  */
-public interface Result {
- public class Success implements Result{}
- public class Failure implements Result{
-  private final String message;
+public interface Result<T> {
+  void bind(Effect<T> success, Effect<String> failure);
 
-  public Failure(String messageError) {
-   message = messageError;
+  static <T> Result<T> failure(String message) {
+    return new Failure<>(message);
   }
 
-  public String getMessage() {
-   return message;
+  static <T> Result<T> success(T value) {
+    return new Success<>(value);
   }
- }
+
+  class Success<T> implements Result<T> {
+    private final T value;
+
+    public Success(T value) {
+      this.value = value;
+    }
+
+    @Override
+    public void bind(Effect<T> success, Effect<String> failure) {
+      success.apply(value);
+    }
+  }
+
+  class Failure<T> implements Result<T> {
+    private final String message;
+
+    public Failure(String messageError) {
+      message = messageError;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+
+    @Override
+    public void bind(Effect<T> success, Effect<String> failure) {
+      failure.apply(message);
+    }
+  }
 }

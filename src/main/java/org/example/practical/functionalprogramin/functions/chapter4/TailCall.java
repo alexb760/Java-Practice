@@ -7,8 +7,8 @@ import java.util.function.Supplier;
  *
  * <p>This {@link TailCall} abstract class has two subclasses. One represents an intermediate call,
  * when the processing of one step is suspended to call the method again for evaluating the next
- * step. This is represented by a subclass named Suspend. It’s instantiated with
- * Supplier<TailCall>>, which represents the next recursive call. This way, instead of putting all
+ * step. This is represented by a subclass named {@link Suspend}. It’s instantiated with
+ * Supplier<TailCall<T>>, which represents the next recursive call. This way, instead of putting all
  * TailCalls in a list, you’ll construct a linked list by linking each tail call to the next. The
  * benefit of this approach is that such a linked list is a stack, offering constant time insertion
  * as well as constant time access to the last inserted element, which is optimal for a LIFO

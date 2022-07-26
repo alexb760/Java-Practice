@@ -15,7 +15,7 @@ import java.util.Scanner;
  *
  * <p>Constraints
  *
- * <p>is composed of any of the following: English alphabetic letters, blank spaces, exclamation
+ * <p>is composed of the following: English alphabetic letters, blank spaces, exclamation
  * points (!), commas (,), question marks (?), periods (.), underscores (_), apostrophes ('), and at
  * symbols (@). Output Format
  *

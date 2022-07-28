@@ -2,6 +2,8 @@ package functionaljavaprogramin.chapters.chapter4;
 
 import static functionaljavaprogramin.chapters.chapter4.TailCall.Suspend.ret;
 import static functionaljavaprogramin.chapters.chapter4.TailCall.Suspend.sus;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author Alexander Bravo
@@ -34,11 +36,25 @@ public class mainClass {
       : sus(() -> addRecFunctional(x + 1, y - 1));
  }
 
+ static String addSI(String s, Integer i) {
+  return "(" + s + " +" + i + ")";
+ }
+
+ private static String addIS(Integer i, String s) {
+  return "(" + i + " +" + s + ")";
+ }
+
   public static void main(String[] args) {
     // recursion
     //System.out.println(addRec( 5, 20000));
 
-   System.out.println(addRecFunctional( 5, 1_000_000_000 ).eval());
+//   System.out.println(addRecFunctional( 5, 1_000_000_000 ).eval());
 
+   List<Integer> list = CollectionUtilities.list(1, 2, 3, 4, 5);
+   String identity = "0";
+   Function<String, Function<Integer, String>> f = x -> y -> addSI(x, y);
+   Function<Integer, Function<String, String>> fRight = x -> y -> addIS(x, y);
+    System.out.println(CollectionUtilities.foldLeft(list, identity, f));
+    System.out.println(CollectionUtilities.foldRight(list, identity, fRight));
   }
 }

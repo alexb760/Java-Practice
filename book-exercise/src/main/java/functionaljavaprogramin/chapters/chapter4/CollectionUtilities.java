@@ -97,6 +97,32 @@ public class CollectionUtilities {
   // learn how to make stack-safe recursion available.
   // The naive version will work for at least 5,000 elements, which is enough for an exercise:
   public static <T, U> U foldRight(List<T> ts, U identity, Function<T, Function<U, U>> f) {
+    // tail recursive
     return ts.isEmpty() ? identity : f.apply(head(ts)).apply(foldRight(tail(ts), identity, f));
+  }
+
+  // Recursive stack-safe.
+  public static <T, U> TailCall<U> _foldRight(
+      List<T> ts, U identity, Function<U, Function<T, U>> f) {
+    return ts.isEmpty()
+        ? TailCall.Suspend.ret(identity)
+        : TailCall.Suspend.sus(() -> _foldRight(tail(ts), f.apply(identity).apply(head(ts)), f));
+  }
+
+  // range function  recursive by using an accumulator
+  public static List<Integer> rangeAcc(List<Integer> acc, Integer start, Integer end) {
+    return end <= start ? acc : rangeAcc(append(acc, start), start + 1, end);
+  }
+
+  // must turn this method into a main method and a helper method by using true recursion:
+  public static List<Integer> range(Integer start, Integer end) {
+    return _rangeAcc(list(), start, end).eval();
+  }
+
+  //Recursive using stack-safe recursion.
+  private static TailCall<List<Integer>> _rangeAcc(List<Integer> acc, Integer start, Integer end) {
+    return end <= start
+        ? TailCall.Suspend.ret(acc)
+        : TailCall.Suspend.sus(() -> _rangeAcc(append(acc, start), start + 1, end));
   }
 }

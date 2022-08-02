@@ -28,6 +28,8 @@ public class ComposeAll {
  }
 }
 
+
+
 class main {
   public static void main(String[] args) {
    //We’ve implemented andThenAll rather than composeAll! To get the correct result, you first have to reverse the list:

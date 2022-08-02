@@ -1,6 +1,8 @@
 package functionaljavaprogramin.chapters;
 
 /**
+ * (https://github.com/fpinjava/fpinjava)
+ *
  * Basic Definition of a pure function: It must not mutate anything outside the function. No
  *
  * <p>internal mutation may be visible from the outside.

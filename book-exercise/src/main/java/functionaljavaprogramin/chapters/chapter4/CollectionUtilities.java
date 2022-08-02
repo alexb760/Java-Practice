@@ -39,6 +39,14 @@ public class CollectionUtilities {
     return list.get(0);
   }
 
+  public static <T> List<T> prepend(T t, List<T> list) {
+    return foldLeft(list, list(t), a -> b -> append(a, b));
+  }
+
+  public static <T> List<T> reverse(List<T> list) {
+    return foldLeft(list, list(), x -> y -> prepend(y, x));
+  }
+
   // The copy method is also basic. It’s the same as the list-creation method, taking a list as its
   // argument.
   // Note that copy is private. It returns a mutable list. To make a copy from the outside, you can

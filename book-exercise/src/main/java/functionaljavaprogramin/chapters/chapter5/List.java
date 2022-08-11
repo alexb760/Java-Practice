@@ -46,6 +46,7 @@ public abstract class List<A> {
    * @return List after condition evaluation.
    */
   public abstract List<A> dropWhile(Function<A, Boolean> condition);
+  public abstract List<A> reverse();
 
   // Singleton instance representing an empty list
   public static final List NIL = new Nil();
@@ -89,6 +90,11 @@ public abstract class List<A> {
 
     @Override
     public List<A> dropWhile(Function<A, Boolean> condition) {
+      return this;
+    }
+
+    @Override
+    public List<A> reverse() {
       return this;
     }
   }
@@ -144,6 +150,17 @@ public abstract class List<A> {
     @Override
     public List<A> dropWhile(Function<A, Boolean> condition) {
       return dropWhile_(this, condition).eval();
+    }
+
+    @Override
+    public List<A> reverse() {
+      return reverse_(list(), this).eval();
+    }
+
+    private TailCall<List<A>> reverse_(List<A> acc, List<A> list){
+      return list.isEmpty()
+          ? TailCall.Suspend.ret(acc)
+          : TailCall.Suspend.sus(() -> reverse_(new Cons<>(list.head(), acc), list.tail()));
     }
 
     // Ex. 5.6
@@ -217,6 +234,12 @@ public abstract class List<A> {
   // And if you need a static method, it can simply call the instance implementation:
   public static <A> List<A> setHead(List<A> list, A h) {
     return list.setHead(h);
+  }
+
+  public static <A, B> B foldRight(List<A> list, B identity, Function<A, Function<B, B>> f){
+    return list.isEmpty()
+        ? identity
+        : f.apply(list.head()).apply(foldRight(list.tail(), identity, f));
   }
 
 

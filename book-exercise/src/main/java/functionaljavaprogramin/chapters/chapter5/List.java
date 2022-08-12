@@ -47,6 +47,13 @@ public abstract class List<A> {
    */
   public abstract List<A> dropWhile(Function<A, Boolean> condition);
   public abstract List<A> reverse();
+  //Ex. 5.9
+  public abstract int length();
+  // Ex. 5.10
+  // The Nil implementation will obviously return identity. For the Cons implementation, start with
+  // defining a front-end method foldLeft calling a stack-based tail recursive helper method
+  // foldLeft_ with an accumulator acc initialized to identity and a reference to this:
+  public abstract <B> B foldLeft(B identity, Function<B, Function<A, B>> f);
 
   // Singleton instance representing an empty list
   public static final List NIL = new Nil();
@@ -96,6 +103,16 @@ public abstract class List<A> {
     @Override
     public List<A> reverse() {
       return this;
+    }
+
+    @Override
+    public int length() {
+      return 0;
+    }
+
+    @Override
+    public <B> B foldLeft(B identity, Function<B, Function<A, B>> f) {
+      return identity;
     }
   }
 
@@ -155,6 +172,26 @@ public abstract class List<A> {
     @Override
     public List<A> reverse() {
       return reverse_(list(), this).eval();
+    }
+
+    @Override
+    // Note that this implementation, beside being stack-based recursive, has very poor performance.
+    // Even if transformed to heap-based, it’s still O(n), meaning the time needed to return the
+    // length is proportional to the length of the list. In following chapters, you’ll see how to
+    // get the length of a linked list in constant time.
+    public int length() {
+      return foldRight(this, 0, x -> y -> y + 1);
+    }
+
+    @Override
+    public <B> B foldLeft(B identity, Function<B, Function<A, B>> f) {
+      return foldLeft_(identity, this, f).eval();
+    }
+
+    private <B> TailCall<B> foldLeft_(B acc, List<A> list, Function<B, Function<A, B>> f) {
+      return list.isEmpty()
+          ? TailCall.Suspend.ret(acc)
+          : TailCall.Suspend.sus(() -> foldLeft_(f.apply(acc).apply(list.head()), list.tail(), f));
     }
 
     private TailCall<List<A>> reverse_(List<A> acc, List<A> list){
@@ -236,7 +273,20 @@ public abstract class List<A> {
     return list.setHead(h);
   }
 
-  public static <A, B> B foldRight(List<A> list, B identity, Function<A, Function<B, B>> f){
+  /**
+   * The foldRight method uses recursion, but it’s not tail recursive, so it will rapidly overflow
+   * the stack. How rapidly depends on several factors, the most important of which is the size of
+   * the stack. In Java, the size of the stack is configurable through the -Xss command-line
+   * parameter, but the major drawback is that the same size is used for all threads. Using a bigger
+   * stack would be a waste of memory for most threads.
+   *
+   * <p>Instead of using foldRight, create a foldLeft method that’s tail recursive and can be made
+   * stack-safe. Here’s its signature:
+   *
+   * <p>public abstract <B> B foldLeft(B identity, Function<B, Function<A, B>> f);
+   *
+   */
+  public static <A, B> B foldRight(List<A> list, B identity, Function<A, Function<B, B>> f) {
     return list.isEmpty()
         ? identity
         : f.apply(list.head()).apply(foldRight(list.tail(), identity, f));

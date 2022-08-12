@@ -15,6 +15,6 @@ public class mainTest {
     System.out.println(List.list(1,2,3,4,5,6,7,8,8,6,5,4,4,2,2).drop(10));
     System.out.println(List.list(1,2,3,4,5,6,7,8,8,6,5,4,4,2,2).drop(10).setHead(10).cons(11));
     System.out.println(List.foldRight(list(7, 2, 3), 1, x -> y -> y + x));
-    System.out.println(List.list(1,2,3,4,5,6,7,8,9).reverse());
+    System.out.println(List.list(1,2,3,4,5,6,7,8,9).length());
   }
 }

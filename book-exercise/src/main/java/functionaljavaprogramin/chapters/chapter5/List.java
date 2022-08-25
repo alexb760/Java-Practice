@@ -292,5 +292,24 @@ public abstract class List<A> {
         : f.apply(list.head()).apply(foldRight(list.tail(), identity, f));
   }
 
+  //Ej. 5.14:
+  // Since foldRight is a stack-safe methos it has some limitations so.
+  // we converted to a HEAP-SAFE implementation using recursion.
+  public static <B, A> B foldRightHeapSafe(List<A> list, B identity, Function<A, Function<B, B>> f){
+    return foldRight_Heap_safe(identity, list, f).eval();
+  }
+
+  // Heap-safe
+  private static <A, B> TailCall<B> foldRight_Heap_safe(
+      B acc,
+      List<A> list,
+      Function<A, Function<B, B>> f){
+    return list.isEmpty()
+        ? TailCall.Suspend.ret(acc)
+        : TailCall.Suspend.sus(
+            () -> foldRight_Heap_safe(f.apply(list.head()).apply(acc), list.tail(), f));
+  }
+
+
 
 }

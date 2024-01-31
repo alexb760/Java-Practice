@@ -1,4 +1,0 @@
-rootProject.name = 'Java-Practice'
-include 'challenge'
-include 'book-exercise'
-

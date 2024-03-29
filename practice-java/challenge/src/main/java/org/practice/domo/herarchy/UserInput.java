@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MalwareAnalysis {
+public class UserInput {
 
         public static class TextInput {
             private List<Character> chars = new ArrayList<>();

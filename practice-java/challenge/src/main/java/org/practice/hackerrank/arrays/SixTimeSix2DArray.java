@@ -71,17 +71,15 @@ public class SixTimeSix2DArray {
                 List.of(1,1,1,0,0,0),
                 List.of(0,0,2,4,4,0),
                 List.of(0,0,0,2,0,0),
-                List.of(0,0,1,2,4,0)
-        );
+                List.of(0,0,1,2,4,0));
 
         List<List<Integer>> arr1 = List.of(
                 List.of(0,-4,-6,0,-7,-6),
                 List.of(-1,-2,-6,-8,-3,-1),
-                List.of(-8, -4, -2, -8, -8, -6),
-                List.of(-3, -1, -2, -5, -7, -4),
-                List.of(-3, -5, -3, -6, -6, -6),
-                List.of(-3, -6, 0, -8, -6, -7)
-        );
+                List.of(-8,-4,-2,-8,-8,-6),
+                List.of(-3,-1,-2,-5,-7,-4),
+                List.of(-3,-5,-3,-6,-6,-6),
+                List.of(-3,-6,0,-8,-6,-7));
 
         int sum = hourglassSum(arr);
         System.out.println(sum);
